@@ -3,7 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors')
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 // Connect to MongoDB
 mongoose.connect('mongodb+srv://ethanoutangoun:j5E92M40BnnuImQb@testcluster.mtuva8j.mongodb.net/outiblog', {
