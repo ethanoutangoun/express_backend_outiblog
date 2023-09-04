@@ -3,7 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors')
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8000;
 
 // Connect to MongoDB
 mongoose.connect('mongodb+srv://ethanoutangoun:j5E92M40BnnuImQb@testcluster.mtuva8j.mongodb.net/outiblog', {
@@ -27,6 +27,11 @@ const blogSchema = new mongoose.Schema({
   author: String,
   comments: [commentSchema],
   id: Number,
+  date: {
+    type: Date,
+    default: Date.now, // This sets the default value to the current date and time
+  }
+  
 });
 
 const Blog = mongoose.model('Blogs', blogSchema);
