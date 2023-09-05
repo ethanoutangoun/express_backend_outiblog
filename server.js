@@ -6,7 +6,7 @@ const app = express();
 const PORT = process.env.PORT || 8000;
 
 // Connect to MongoDB
-mongoose.connect(process.env.DB_URL || 'mongodb+srv://ethanoutangoun:j5E92M40BnnuImQb@testcluster.mtuva8j.mongodb.net/outiblog', {
+mongoose.connect(process.env.DB_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -119,36 +119,33 @@ app.delete('/api/blogs/:id', async (req, res) => {
     }
   });
   
-// Combined PATCH route to update comments and/or body of a specific blog by its ID
+// PATCH route to update comments of a specific blog by its ID
 app.patch('/api/blogs/:id', async (req, res) => {
-  try {
-    const { id } = req.params; // Get the blog ID from the URL
-    const { comments, body } = req.body; // Comments and/or updated blog body
-
-    // Find the blog by its ID
-    const updatedBlog = await Blog.findByIdAndUpdate(
-      id,
-      {
-        ...(comments && { $set: { comments } }), // Update comments if provided
-        ...(body && { $set: { body } }), // Update body if provided
-      },
-      { new: true }
-    );
-
-    if (!updatedBlog) {
-      return res.status(404).json({ error: 'Blog not found' });
+    try {
+      const { id } = req.params; // Get the blog ID from the URL
+      const { comments } = req.body; // Comments to be added or updated
+  
+      // Validate data
+      if (!Array.isArray(comments)) {
+        return res.status(400).json({ error: 'Comments must be an array' });
+      }
+  
+      // Find the blog by its ID and update its comments
+      const updatedBlog = await Blog.findByIdAndUpdate(
+        id,
+        { $set: { comments } },
+        { new: true }
+      );
+  
+      if (!updatedBlog) {
+        return res.status(404).json({ error: 'Blog not found' });
+      }
+  
+      res.json({ message: 'Comments updated successfully', blog: updatedBlog });
+    } catch (error) {
+      res.status(500).json({ error: 'Internal server error' });
     }
-
-    let message = 'Blog updated successfully';
-
-   
-
-    res.json({ message, blog: updatedBlog });
-  } catch (error) {
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
+  });
 
   
 app.listen(PORT, () => {
