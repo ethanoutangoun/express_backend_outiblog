@@ -19,6 +19,7 @@ const commentSchema = new mongoose.Schema({
   date: Date,
   likes: Number,
   edited: Boolean,
+  likedBy: Array
 });
 
 const blogSchema = new mongoose.Schema({
