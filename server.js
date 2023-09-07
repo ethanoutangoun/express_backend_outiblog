@@ -5,8 +5,11 @@ const cors = require('cors')
 const app = express();
 const PORT = process.env.PORT || 8000;
 
+app.use(express.json());
+app.use(cors());
+
 // Connect to MongoDB
-mongoose.connect(process.env.DB_URL, {
+mongoose.connect("mongodb+srv://ethanoutangoun:j5E92M40BnnuImQb@testcluster.mtuva8j.mongodb.net/outiblog" || process.env.DB_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -35,10 +38,70 @@ const blogSchema = new mongoose.Schema({
   
 });
 
+const userSchema = new mongoose.Schema({
+  user_id : String,
+  username : String,
+  user_blogs : Array,
+  user_picture : String
+})
+
+//USER ROUTES
+const User = mongoose.model('User', userSchema);
+
+app.get('/api/users/:user_id', async (req, res) => {
+  const { user_id } = req.params;
+
+  try {
+    // Find the user by user_id in the database
+    const user = await User.findOne({ user_id });
+
+    if (!user) {
+      // If the user is not found, return a 404 response
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // If the user is found, return their information
+    res.status(200).json(user);
+  } catch (error) {
+    // Handle any errors that occur during the database query
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+
+app.post('/api/users', async (req, res) => {
+  try {
+    // Create a new user based on the request body
+ 
+    const { user_id, username, user_picture } = req.body;
+    
+    
+    const newUser = new User({
+      user_id,
+      username,
+      user_blogs : [],
+      user_picture
+      
+    });
+    // Save the new user to the database
+    await newUser.save();
+
+    // Return the newly created user as a response
+    res.status(201).json(newUser);
+  } catch (error) {
+    // Handle any errors that occur during user creation or database save
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+
+
+//BLOG ROUTES
 const Blog = mongoose.model('Blogs', blogSchema);
 
-app.use(express.json());
-app.use(cors());
+
 
 // get ALL blogs (may change just to a few once I scale up)
 app.get('/api/blogs', async (req, res) => {
