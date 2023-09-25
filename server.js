@@ -39,11 +39,11 @@ const blogSchema = new mongoose.Schema({
 });
 
 const userSchema = new mongoose.Schema({
-  user_id : String,
-  username : String,
-  user_blogs : Array,
-  user_picture : String
-})
+  user_id: { type: String, unique: true }, // Unique primary key
+  username: String,
+  user_blogs: Array,
+  user_picture: String
+});
 
 //USER ROUTES
 const User = mongoose.model('User', userSchema);
