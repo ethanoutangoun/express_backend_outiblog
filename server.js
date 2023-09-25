@@ -39,7 +39,7 @@ const blogSchema = new mongoose.Schema({
 });
 
 const userSchema = new mongoose.Schema({
-  user_id: { type: String, unique: true }, // Unique primary key
+  user_id: String, // Unique primary key
   username: String,
   user_blogs: Array,
   user_picture: String
@@ -96,6 +96,18 @@ app.post('/api/users', async (req, res) => {
   }
 });
 
+app.patch('/api/users/:user_id', async (req, res) => {
+   try {
+     const { user_id } = req.params; // Get the user ID from the URL 
+     const { user_blogs } = req.body; // User blogs to be updated 
+     // Validate data 
+     if (!Array.isArray(user_blogs)) { 
+      return res.status(400).json({ error: 'User blogs must be an array' }); } 
+      // Find the user by their ID and update their user_blogs 
+    const updatedUser = await User.findOneAndUpdate( { user_id }, { $set: { user_blogs } }, { new: true } ); if (!updatedUser) { return res.status(404).json({ error: 'User not found' }); } res.json({ message: 'User blogs updated successfully', user: updatedUser }); } catch (error) { console.error(error); res.status(500).json({ message: 'Internal Server Error' });
+   } 
+  }
+  );
 
 
 //BLOG ROUTES
